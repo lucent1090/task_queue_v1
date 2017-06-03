@@ -1,0 +1,26 @@
+{
+  "kue_config": {
+    "PORT": 3030,
+    "CLEAN_INTERVAL": 604800000,
+    "FAILEDJOB_REDO_INTERVAL": 86400000,
+    "SHUTDOWN_DELAY": 60000,
+    "MAX_PROCESS_JOB": 2
+  },
+  "redis_config": {
+    "REDIS_RETRY_TIMEOUT": 60000,
+    "REDIS_RETRY_ATTEMPT": 10,
+    "REDIS_RETRY_TIME": 3000
+  },
+  "mail_options": {
+    "feedbackName": "報導者 The Reporter"
+  },
+  "smtp_config": {
+    "SMTPUsername": "no-reply@t-reporters.org",
+    "SMTPPassword": "I'iJ}Y2W_k[V",
+    "SMTPServer": "smtp.office365.com",
+    "SMTPPort": "587",
+    "connectionTimeout": 300000,
+    "maxConnection": 20,
+    "maxReconnectAttempts": 5
+  }
+}

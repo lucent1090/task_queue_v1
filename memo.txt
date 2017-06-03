@@ -1,0 +1,4 @@
+unit test:
+queue.watchStuckJobs 沒有作用？
+
+送信顯示為complete 但gmail, yahoo沒有收到信
