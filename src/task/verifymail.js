@@ -9,9 +9,9 @@ export const verifymail = {
   transporter: null,
   taskServer: null,
   worker: function (job, done) {
-    let _ = this
+    let self = this
     let promise = new Promise(function (resolve, reject) {
-      _.transporter.verify((error, success) => {
+      self.transporter.verify((error, success) => {
         if(error){
           reject(error)
         }else{
@@ -20,7 +20,7 @@ export const verifymail = {
       })
     })
     promise.then(function () {
-      if( !_.taskServer.isRedisError() ){
+      if( !self.taskServer.isRedisError() ){
         let data = job.data
         if( (data.to=='') || (data.title=='') || (data.template=='') ) {
           done( new Error('email cannot send with empty field') )
@@ -29,13 +29,13 @@ export const verifymail = {
 
         let mailOptions = {
           // sender address must be the same as SMTP username
-          from: `"${_.mail_options.feedbackName}" <${_.smtp_config.SMTPUsername}>`, // sender address
+          from: `"${self.mail_options.feedbackName}" <${self.smtp_config.SMTPUsername}>`, // sender address
           to: data.to, // receiver address
           subject: data.title,
           html: data.template // html content
         }
 
-        _.transporter.sendMail(mailOptions, (err, success) => {
+        self.transporter.sendMail(mailOptions, (err, success) => {
           if(err){
             done(err)
           }else{

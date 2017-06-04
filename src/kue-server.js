@@ -10,7 +10,6 @@ export default function kueServer () {
   let jobTypeList = []
 
   function create () {
-    return new Promise((resolve, reject) => {
       // redis set up
       let redisConfig = {};
       if (process.env.NODE_ENV === 'production') {
@@ -48,7 +47,6 @@ export default function kueServer () {
         console.log('kue UI on port ' + kue_config.PORT);
       } catch (err) {
         console.log('kue-server: cannot start kue express server', err);
-        reject(err)
       }
 
       // maintain redis connection
@@ -82,11 +80,6 @@ export default function kueServer () {
         }
       })
 
-      queue.on('ready', () => {
-        resolve()
-      })
-    })
-
   }
 
   function setConfig (config) {
@@ -95,7 +88,7 @@ export default function kueServer () {
   }
 
   function setJobTypeList (type) {
-    if( !jobTypeList.includes(type)  ){
+    if( ! jobTypeList.includes(type)  ){
       jobTypeList.push(type)
     }
   }

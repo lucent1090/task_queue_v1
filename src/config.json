@@ -4,7 +4,7 @@
     "CLEAN_INTERVAL": 604800000,
     "FAILEDJOB_REDO_INTERVAL": 86400000,
     "SHUTDOWN_DELAY": 60000,
-    "MAX_PROCESS_JOB": 10
+    "MAX_PROCESS_JOB": 5
   },
   "redis_config": {
     "REDIS_RETRY_TIMEOUT": 60000,
@@ -20,7 +20,7 @@
     "SMTPServer": "smtp.office365.com",
     "SMTPPort": "587",
     "connectionTimeout": 300000,
-    "maxConnection": 20,
+    "maxConnection": 5,
     "maxReconnectAttempts": 5
   }
 }

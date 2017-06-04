@@ -7,7 +7,6 @@ export default function smtp () {
   let transporter = null;
 
   function create () {
-    return new Promise ((resolve, reject) => {
       transporter = nodemailer.createTransport({
         pool: true,
         maxConnections: smtp_config.maxConnection,
@@ -25,13 +24,10 @@ export default function smtp () {
       transporter.verify((error, success) => {
         if( error ){
           console.log('SMTP server create error: ', error);
-          reject()
         }else{
           console.log('SMTP server is ready');
-          resolve()
         }
       });
-    })
 
   }
 
