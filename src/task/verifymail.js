@@ -1,4 +1,4 @@
-export const verifymail = {
+export let verifymail = {
   type: 'SEND_VERIFY_MAIL',
   mail_options: {
     feedbackName: null
@@ -10,17 +10,15 @@ export const verifymail = {
   taskServer: null,
   worker: function (job, done) {
     let self = this
-    let promise = new Promise(function (resolve, reject) {
-      self.transporter.verify((error, success) => {
-        if(error){
-          reject(error)
-        }else{
-          resolve()
+    self.transporter.verify((error, success) => {
+      if(error){
+        done(new Error ('verify mail cannot be sent without smtp connection'))
+      }else{
+        if( !self.taskServer.isRedisError() ){
+          done(new Error ('verify mail cannot be sent with redis disconnection'))
         }
-      })
-    })
-    promise.then(function () {
-      if( !self.taskServer.isRedisError() ){
+
+        // start send verify mail
         let data = job.data
         if( (data.to=='') || (data.title=='') || (data.template=='') ) {
           done( new Error('email cannot send with empty field') )
@@ -42,15 +40,8 @@ export const verifymail = {
             done()
           }
         })
-
-      }else{
-        console.log('redis connection error')
-        job.state('inactive').save()
+        // send verify mail done
       }
-
-    }, (err) => {
-      console.log(err)
-      job.state('inactive').save()
     })
 
   },

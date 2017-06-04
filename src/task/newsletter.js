@@ -1,4 +1,4 @@
-export const newsletter = {
+export let newsletter = {
   type: 'SEND_NEWSLETTER',
   mail_options: {
     feedbackName: null
@@ -23,19 +23,12 @@ export const newsletter = {
       html: data.template // html content
     }
 
-    let promise = new Promise ((resolve, reject) => {
-      self.transporter.sendMail(mailOptions, (err, success) => {
-        if(err){
-          reject(err)
-        }else{
-          resolve()
-        }
-      })
-    })
-    promise.then(() => {
-      done()
-    }, (err) => {
-      done(err)
+    self.transporter.sendMail(mailOptions, (err, success) => {
+      if(err){
+        done(err)
+      }else{
+        done()
+      }
     })
   },
   setConfig: function (config) {

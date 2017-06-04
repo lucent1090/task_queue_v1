@@ -142,6 +142,6 @@ export default function kueServer () {
     setJobClean,
     setFailedJobRedo,
     setJobTypeList,
-    isRedisError,
+    isRedisError
   }
 }

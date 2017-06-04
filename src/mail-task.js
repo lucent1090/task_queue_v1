@@ -11,11 +11,16 @@ export default function mailTask () {
   let mailServer, taskServer, config
 
   function start () {
-    // load config
-    try{
-      config = JSON.parse( fs.readFileSync('./src/config.json') )
-    } catch (err) {
-      console.log(err)
+
+    if( arguments.length == 1 ){
+      config = arguments[0]
+    }else{
+      // load config
+      try{
+        config = JSON.parse( fs.readFileSync('./src/config.json') )
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     // init smtp
