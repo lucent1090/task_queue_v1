@@ -59,7 +59,7 @@ export default function kueServer () {
       }).on('error', (err) => {
         redisError = true;
       });
-      
+
       // check redis periodically in case unstable redis connection
       queue.watchStuckJobs(6000);
 
@@ -73,7 +73,7 @@ export default function kueServer () {
       });
 
       queue.on('job enqueue', (id, type) => {
-        if( jobTypeList.find(type) == undefined ){
+        if( !jobTypeList.includes(type) ){
           kue.Job.get(id, (err, job) => {
             if (err) return;
             console.log('Unregistered job type: ', type)
@@ -95,7 +95,9 @@ export default function kueServer () {
   }
 
   function setJobTypeList (type) {
-    jobTypeList.push(type)
+    if( !jobTypeList.includes(type)  ){
+      jobTypeList.push(type)
+    }
   }
 
   function getQueue () {

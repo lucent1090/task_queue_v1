@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "babel --presets es2015 src --ignore config.json -d lib",
     "queue": "babel --presets es2015 src --ignore config.json -d lib && node ./lib/index.js",
-    "test-unit": "babel --presets es2015 test/unit -d lib/unit && mocha --timeout 60000 ./lib/unit"
+    "test-unit": "babel --presets es2015 test/unit -d lib/unit && mocha --timeout 60000 ./lib/unit",
+    "test-func": "babel --presets es2015 test/functional -d lib/functional && mocha ./lib/functional"
   },
   "author": "",
   "license": "ISC",

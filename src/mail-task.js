@@ -4,6 +4,9 @@ import fs from 'fs'
 import smtp from './smtp-server'
 import kueServer from './kue-server'
 
+// import { newsletter } from './task/newsletter'
+// import { verifymail } from './task/verifymail'
+
 export default function mailTask () {
   let mailServer, taskServer, config
 
