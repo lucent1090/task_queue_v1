@@ -46,12 +46,12 @@ exports.create = function () {
 }
 
 function server (mailServer, taskServer, config, em) {
-
   return {
     mailServer, // smtp connection
     taskServer, // queue server
     config,     // config.json
     addWorker,  // function: add new worker to queue server
+    close,      // function: close queue and smtp connection
     em          // function: events
   }
 }
@@ -75,4 +75,10 @@ function addWorker (taskFile) {
   this.taskServer.getQueue().process(taskFile.type, this.config.kue_config.MAX_PROCESS_JOB, (job, done) => {
     taskFile.worker(job, done)
   })
+}
+
+function close () {
+  this.taskServer.close()
+  this.mailServer.close()
+  process.exit(0)
 }

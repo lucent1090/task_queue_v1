@@ -131,19 +131,26 @@ export default function kueServer () {
           return ;
         }
 
-        console.log('kue-server: redo failed jobs');
+        console.log('kue-server: redo failed jobs')
         failedjobs.forEach((job)=>{
           job.state('inactive').save();
         });
       });
     }
-    setInterval(failedRedo, failedjob_redo_interval);
+    setInterval(failedRedo, failedjob_redo_interval)
+  }
+
+  function close () {
+    queue.shutdown( 5000, function(err) {
+      console.log( 'kue-server: shutdown: ', err||'ok' )
+    })
   }
 
   return {
     create,          // create queue
     initSetting,     // add error callback
     getQueue,
+    close,           // close queue
     setJobClean,     // function: clean complete job
     setFailedJobRedo,// function: redo failed job
     addJobTypeList,  // function: regist job type

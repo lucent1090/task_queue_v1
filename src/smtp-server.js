@@ -39,8 +39,14 @@ export default function smtp () {
     return transporter;
   }
 
+  function close () {
+    console.log('SMTP server: close')
+    transporter.close()
+  }
+
   return {
     create,
     getTransporter,
+    close
   }
 }
