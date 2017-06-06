@@ -80,5 +80,5 @@ function addWorker (taskFile) {
 function close () {
   this.taskServer.close()
   this.mailServer.close()
-  process.exit(0)
+  // process.exit(0)
 }

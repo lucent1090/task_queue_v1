@@ -14,7 +14,7 @@ export let verifymail = {
       if(error){
         done(new Error ('verify mail cannot be sent without smtp connection'))
       }else{
-        if( !self.taskServer.isRedisError() ){
+        if( self.taskServer.isRedisError() ){
           done(new Error ('verify mail cannot be sent with redis disconnection'))
         }
 

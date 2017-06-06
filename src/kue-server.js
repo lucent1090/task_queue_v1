@@ -141,20 +141,20 @@ export default function kueServer () {
   }
 
   function close () {
-    queue.shutdown( 5000, function(err) {
+    queue.shutdown( 1, function(err) {
       console.log( 'kue-server: shutdown: ', err||'ok' )
     })
   }
 
   return {
     create,          // create queue
-    initSetting,     // add error callback
+    initSetting,     // init error callback
     getQueue,
     close,           // close queue
     setJobClean,     // function: clean complete job
     setFailedJobRedo,// function: redo failed job
     addJobTypeList,  // function: regist job type
     getJobTypeList,
-    isRedisError
+    isRedisError     // redis error flag
   }
 }

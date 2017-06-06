@@ -68,10 +68,38 @@ export const testConfig = {
       }
     }
   },
+
   createJobUrl: 'http://localhost:3030/job',
   getQueueState: 'http://localhost:3030/stats',
 
-  delayCheckMailTime: 15,
+  fakeConfig: {
+    "kue_config": {
+      "PORT": 3030,
+      "CLEAN_INTERVAL": 30000,
+      "FAILEDJOB_REDO_INTERVAL": 20000,
+      "SHUTDOWN_DELAY": 60000,
+      "MAX_PROCESS_JOB": 5
+    },
+    "redis_config": {
+      "REDIS_RETRY_TIMEOUT": 60000,
+      "REDIS_RETRY_ATTEMPT": 10,
+      "REDIS_RETRY_TIME": 3000
+    },
+    "mail_options": {
+      "feedbackName": "報導者 The Reporter"
+    },
+    "smtp_config": {
+      "SMTPUsername": "newsletter-twreporter@outlook.com",
+      "SMTPPassword": "testAccount4SendingMail",
+      "SMTPServer": "smtp.office365.com",
+      "SMTPPort": "587",
+      "connectionTimeout": 300000,
+      "maxConnection": 5,
+      "maxReconnectAttempts": 5
+    }
+  },
+
+  delayCheckMailTime: 5,
 
   mailLogin: {
     user: 'shihyen@twreporter.org',
