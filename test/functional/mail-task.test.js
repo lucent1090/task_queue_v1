@@ -20,11 +20,24 @@ describe('mail-task test', function () {
   this.timeout(100000)
   let mailtaskServer
 
+  let failedJobNum
+  function callback (num) {
+    failedJobNum = num
+  }
+  function getFailedJob (callback) {
+    let promise = getCount('failedCount')
+    promise.then((count) => {
+      console.log('get failed count: ', count)
+      callback(count)
+    })
+  }
+
   before(function (done) {
     mailtaskServer = mailtask.create(testConfig.fakeConfig)
     mailtaskServer.addWorker(newsletter)
     mailtaskServer.addWorker(verifymail)
     mailtaskServer.em.on('mail-task-ready', () => {
+      setTimeout(getFailedJob, 40000, callback)
       done()
     })
   })
@@ -118,7 +131,7 @@ describe('mail-task test', function () {
     })
 
   })
-  */
+
   describe('send verify mail failed', function () {
     let delayCheckMailTime = testConfig.delayCheckMailTime
 
@@ -319,8 +332,34 @@ describe('mail-task test', function () {
       return expect(promise).eventually.be.rejectedWith( 'no match mail' )
     })
   })
-  describe('clean complete job', function () {})
-  describe('redo failed job', function () {})
+  describe('clean complete job', function () {
+    before(function (done) {
+      mailtaskServer.taskServer.em.on('kue-server-completeJob-clean', function (num) {
+        console.log('kue-server-completeJob-clean: ', num)
+        done()
+      })
+    })
+    it('should clean failed job', function () {
+      let promise = getCount('completeCount')
+      return expect(promise).eventually.equal(0)
+    })
+  })
+*/
+  describe('redo failed job', function () {
+    let num
+    before(function (done) {
+      mailtaskServer.taskServer.em.on('kue-server-failedJob-redo', (type, length) => {
+        console.log('kue-server-failedJob-redo type: ', type)
+        console.log('length: ', length)
+        num = length
+        done()
+      })
+    })
+    it('should add job to inactive queue', function () {
+      let promise = getCount('failedCount')
+      return expect(promise).eventually.equal(failedJobNum - num)
+    })
+  })
 })
 
 function createJob (job) {

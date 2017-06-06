@@ -75,8 +75,8 @@ export const testConfig = {
   fakeConfig: {
     "kue_config": {
       "PORT": 3030,
-      "CLEAN_INTERVAL": 30000,
-      "FAILEDJOB_REDO_INTERVAL": 20000,
+      "CLEAN_INTERVAL": 40000,
+      "FAILEDJOB_REDO_INTERVAL": 50000,
       "SHUTDOWN_DELAY": 60000,
       "MAX_PROCESS_JOB": 5
     },

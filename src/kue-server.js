@@ -1,12 +1,14 @@
 'use strict'
 
 import kue from 'kue'
+import { EventEmitter } from 'events'
 
 export default function kueServer () {
   let queue = null
   let redisError = false
   let lastEnterTime = 0
   let jobTypeList = []
+  let em = new EventEmitter()
 
   function create (kue_config, redis_config) {
     // redis set up
@@ -110,10 +112,11 @@ export default function kueServer () {
     function clean () {
       kue.Job.rangeByState('complete', 0, -1, 'asc', (err, completedjobs)=>{
         if( err || (completedjobs.length==0) ){
-          console.log('kue-server: get completed job error', err);
+          console.log('kue-server: get completed job error', err || ': length = 0');
           return ;
         }
 
+        em.emit('kue-server-completeJob-clean', completedjobs.length)
         console.log('kue-server: clean completed job in task queue');
         completedjobs.forEach((job)=>{
           job.remove();
@@ -127,10 +130,11 @@ export default function kueServer () {
     function failedRedo () {
       kue.Job.rangeByType(jobType, 'failed', 0, -1, 'asc', (err, failedjobs)=>{
         if( err || (failedjobs.length==0) ){
-          console.log('kue-server: get failed job error', err);
+          console.log('kue-server: get failed job error', err || ': length = 0');
           return ;
         }
 
+        em.emit('kue-server-failedJob-redo', jobType, failedjobs.length)
         console.log('kue-server: redo failed jobs')
         failedjobs.forEach((job)=>{
           job.state('inactive').save();
@@ -155,6 +159,7 @@ export default function kueServer () {
     setFailedJobRedo,// function: redo failed job
     addJobTypeList,  // function: regist job type
     getJobTypeList,
-    isRedisError     // redis error flag
+    isRedisError,    // redis error flag
+    em               // event emitter
   }
 }
