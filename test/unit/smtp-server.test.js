@@ -14,9 +14,8 @@ describe('SMTP-server test', () => {
   before(() => {
     createTransportSpy = sinon.spy(nodemailer, 'createTransport')
 
-    config = JSON.parse( fs.readFileSync('./src/config.json') )
+    config = JSON.parse( fs.readFileSync('src/config.json') )
     smtpServer = smtp()
-    smtpServer.setConfig(config)
   })
 
   after(() => {
@@ -24,7 +23,7 @@ describe('SMTP-server test', () => {
   })
 
   it('create function should call nodemailer.createTransport', () => {
-    smtpServer.create()
+    smtpServer.create(config)
 
     expect(createTransportSpy.called).to.be.true
     expect(smtpServer.getTransporter()).to.not.equal(null)

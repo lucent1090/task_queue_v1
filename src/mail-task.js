@@ -3,62 +3,76 @@
 import fs from 'fs'
 import smtp from './smtp-server'
 import kueServer from './kue-server'
+import { EventEmitter } from 'events'
 
-// import { newsletter } from './task/newsletter'
-// import { verifymail } from './task/verifymail'
-
-export default function mailTask () {
-  let mailServer, taskServer, config
-
-  function start () {
-
-    if( arguments.length == 1 ){
-      config = arguments[0]
-    }else{
-      // load config
-      try{
-        config = JSON.parse( fs.readFileSync('./src/config.json') )
-      } catch (err) {
-        console.log(err)
-      }
+exports.create = function () {
+  let config
+  if( arguments.length == 1 ){
+    config = arguments[0]
+  }else{
+    // load config
+    try{
+      config = JSON.parse( fs.readFileSync('src/config.json') )
+    } catch (err) {
+      console.log(err)
     }
-
-    // init smtp
-    mailServer = smtp()
-    mailServer.setConfig( config )
-    mailServer.create()
-
-    // init kue
-    taskServer = kueServer()
-    taskServer.setConfig( config )
-    taskServer.create()
-
-    // process error handling
-    process.once( 'uncaughtException', function(err){
-      console.log('maile-task: uncaught exception, exit process', err);
-      process.exit( 0 );
-    });
   }
 
-  function setWorker (taskFile) {
-    taskServer.setJobTypeList(taskFile.type)
-    taskFile.setConfig(config)
+  // init smtp
+  let mailServer = smtp()
+  let pSMTP = mailServer.create(config.smtp_config)
 
-    if( 'transporter' in taskFile ){
-      taskFile.transporter = mailServer.getTransporter()
-    }
+  // init kue
+  let taskServer = kueServer()
+  let pKue = taskServer.create(config.kue_config, config.redis_config)
+  taskServer.initSetting()
+  taskServer.setJobClean(config.kue_config.CLEAN_INTERVAL)
 
-    if( 'taskServer' in taskFile ){
-      taskFile.taskServer = taskServer
-    }
+  let em = new EventEmitter()
+  let promise = Promise.all([pSMTP, pKue])
+  promise.then(() => {
+    em.emit('mail-task-ready')
+  }, (err) => {
+    em.emit('mail-task-failed')
+  })
 
-    taskServer.getQueue().process(taskFile.type, config.kue_config.MAX_PROCESS_JOB, (job, done) => {
-      taskFile.worker(job, done)
-    })
-  }
+  // process error handling
+  process.once( 'uncaughtException', function(err){
+    console.log('mail-task: uncaught exception, exit process', err);
+    process.exit( 0 );
+  })
+
+  return server(mailServer, taskServer, config, em)
+}
+
+function server (mailServer, taskServer, config, em) {
 
   return {
-    start,
-    setWorker
+    mailServer, // smtp connection
+    taskServer, // queue server
+    config,     // config.json
+    addWorker,  // function: add new worker to queue server
+    em          // function: events
   }
+}
+
+function addWorker (taskFile) {
+  this.taskServer.addJobTypeList(taskFile.type)
+  taskFile.setConfig(this.config)
+
+  if( 'transporter' in taskFile ){
+    taskFile.transporter = this.mailServer.getTransporter()
+  }
+
+  if( 'taskServer' in taskFile ){
+    taskFile.taskServer = this.taskServer
+  }
+
+  if( taskFile.redoFailedJob ){
+    this.taskServer.setFailedJobRedo(taskFile.type, this.config.kue_config.FAILEDJOB_REDO_INTERVAL)
+  }
+
+  this.taskServer.getQueue().process(taskFile.type, this.config.kue_config.MAX_PROCESS_JOB, (job, done) => {
+    taskFile.worker(job, done)
+  })
 }

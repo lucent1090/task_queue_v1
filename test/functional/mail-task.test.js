@@ -112,7 +112,38 @@ function createJob (reqAgent, job) {
 }
 
 describe('task queue', function () {
+  this.timeout(30000)
 
+  before((done) => {
+    let mailTask = mailtask()
+    let em = mailTask.start()
+    em.on('mail-task-ready', () => {
+      done()
+      console.log('mail-task-ready')
+    })
+
+    em.on('mail-task-failed', () => {
+      console.log('mail-task-failed')
+    })
+  })
+
+  it('send verify mail / newsletter success', function () {
+    this.timeout(30000)
+
+    let promise = createJob(successVerifyMail)
+    promise = promise.then(() => {
+      sleep.sleep(delayCheckMailTime)
+
+      return getMail('INBOX', 'UNSEEN', 'HEADER.FIELDS (SUBJECT)', function (buffer) {
+        let title = buffer.subject
+        return title[0]
+      })
+    }, (err) => {
+      console.log(err)
+    })
+    return expect(promise).to.eventually.equal(successVerifyMail.data.title)
+  })
+/*
   describe('send verify mail / newsletter success', function () {
     this.timeout(100000)
 
@@ -306,5 +337,5 @@ describe('task queue', function () {
       return expect(promise).to.eventually.equal(failedCount+1)
     })
   })
-
+*/
 })

@@ -4,5 +4,5 @@ node_modules/
 
 lib/
 notuse/
-
+tmp_backup/
 memo.txt

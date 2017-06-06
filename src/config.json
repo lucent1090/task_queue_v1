@@ -15,8 +15,8 @@
     "feedbackName": "報導者 The Reporter"
   },
   "smtp_config": {
-    "SMTPUsername": "no-reply@t-reporters.org",
-    "SMTPPassword": "I'iJ}Y2W_k[V",
+    "SMTPUsername": "newsletter-twreporter@outlook.com",
+    "SMTPPassword": "testAccount4SendingMail",
     "SMTPServer": "smtp.office365.com",
     "SMTPPort": "587",
     "connectionTimeout": 300000,
