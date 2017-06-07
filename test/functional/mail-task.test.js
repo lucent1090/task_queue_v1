@@ -20,25 +20,11 @@ describe('mail-task test', function () {
   this.timeout(100000)
   let mailtaskServer
 
-  let failedJobNum
-  function callback (num) {
-    failedJobNum = num
-  }
-  function getFailedJob (callback) {
-    let promise = getCount('failedCount')
-    promise.then((count) => {
-      console.log('get failed count: ', count)
-      callback(count)
-    })
-  }
-
   before(function (done) {
     mailtaskServer = mailtask.create(testConfig.fakeConfig)
     mailtaskServer.addWorker(newsletter)
     mailtaskServer.addWorker(verifymail)
     mailtaskServer.em.on('mail-task-ready', () => {
-      let redoTime = testConfig.kue_config.FAILEDJOB_REDO_INTERVAL
-      setTimeout(getFailedJob, redoTime, callback)
       done()
     })
   })
@@ -46,7 +32,7 @@ describe('mail-task test', function () {
     mailtaskServer.close()
   })
 
-  /*
+
   describe('send mail succes', function () {
 
     it('should receive verify mail', function () {
@@ -331,45 +317,6 @@ describe('mail-task test', function () {
       })
 
       return expect(promise).eventually.be.rejectedWith( 'no match mail' )
-    })
-  })
-
-  describe('clean complete job', function () {
-    before(function (done) {
-      mailtaskServer.taskServer.em.on('kue-server-completeJob-clean', function (num) {
-        console.log('clean complete job: before')
-        done()
-      })
-    })
-    it('should clean complete job', function () {
-      let promise = new Promise((resolve, reject) => {
-        mailtaskServer.taskServer.em.on('kue-server-jobRemove-done', () => {
-          console.log('job remove finish')
-          resolve()
-        })
-      })
-      promise = promise.then((resolve, reject) => {
-        return getCount('completeCount')
-      })
-
-      return expect(promise).eventually.equal(0)
-    })
-  })
-*/
-
-  describe('redo failed job', function () {
-    let num
-    before(function (done) {
-      mailtaskServer.taskServer.em.on('kue-server-failedJob-redo', (type, length) => {
-        console.log('kue-server-failedJob-redo type: ', type)
-        console.log('length: ', length)
-        num = length
-        done()
-      })
-    })
-    it('should add job to inactive queue', function () {
-      let promise = getCount('failedCount')
-      return expect(promise).eventually.equal(failedJobNum - num)
     })
   })
 

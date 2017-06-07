@@ -89,18 +89,6 @@ export default function kueServer () {
       }
     })
 
-    let lastRemoveTime = 0
-    let timeoutID
-    queue.on('job remove', (id) => {
-      let curTime = new Date().getSeconds()
-      if(((curTime - lastRemoveTime)%60) < 2){
-        console.log('clear timeout')
-        clearTimeout(timeoutID)
-      }
-      timeoutID = setTimeout(finishRemove, 3000)
-      lastRemoveTime = curTime
-    })
-
   }
 
   function finishRemove () {
@@ -123,42 +111,6 @@ export default function kueServer () {
 
   function isRedisError () {
     return redisError
-  }
-
-  function setJobClean ( clean_interval ) {
-    function clean () {
-      kue.Job.rangeByState('complete', 0, -1, 'asc', (err, completedjobs)=>{
-        if( err || (completedjobs.length==0) ){
-          console.log('kue-server: get completed job error', err || ': length = 0');
-          return
-        }
-
-        em.emit('kue-server-completeJob-clean', completedjobs.length)
-        console.log('kue-server: clean completed job in task queue');
-        completedjobs.forEach((job)=>{
-          job.remove()
-        })
-      })
-    }
-    setInterval(clean, clean_interval);
-  }
-
-  function setFailedJobRedo ( jobType, failedjob_redo_interval ) {
-    function failedRedo () {
-      kue.Job.rangeByType(jobType, 'failed', 0, -1, 'asc', (err, failedjobs)=>{
-        if( err || (failedjobs.length==0) ){
-          console.log('kue-server: get failed job error', err || ': length = 0');
-          return ;
-        }
-
-        em.emit('kue-server-failedJob-redo', jobType, failedjobs.length)
-        console.log('kue-server: redo failed jobs')
-        failedjobs.forEach((job)=>{
-          job.state('inactive').save();
-        });
-      });
-    }
-    setInterval(failedRedo, failedjob_redo_interval)
   }
 
   function close () {
