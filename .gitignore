@@ -6,3 +6,5 @@ lib/
 notuse/
 tmp_backup/
 memo.txt
+src/config.json
+test/functional/testConfig.js

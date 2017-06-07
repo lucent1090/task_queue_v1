@@ -1,6 +1,6 @@
 {
   "kue_config": {
-    "PORT": 3030,
+    "PORT": 3000,
     "SHUTDOWN_DELAY": 5000,
     "MAX_PROCESS_JOB": 5
   },
@@ -10,11 +10,11 @@
     "REDIS_RETRY_TIME": 3000
   },
   "mail_options": {
-    "feedbackName": "報導者 The Reporter"
+    "feedbackName": "feedback_name"
   },
   "smtp_config": {
-    "SMTPUsername": "newsletter-twreporter@outlook.com",
-    "SMTPPassword": "testAccount4SendingMail",
+    "SMTPUsername": "user_name",
+    "SMTPPassword": "user_password",
     "SMTPServer": "smtp.office365.com",
     "SMTPPort": "587",
     "connectionTimeout": 300000,

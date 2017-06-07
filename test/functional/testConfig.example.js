@@ -3,7 +3,7 @@ export const testConfig = {
     "type": 'SEND_NEWSLETTER',
     "data": {
       "title": "success news letter",
-      "to": "shihyen@twreporter.org",
+      "to": "mail",
       "template": "<body><h3>task queue test</h3></body>"
     },
     "options": {
@@ -16,7 +16,7 @@ export const testConfig = {
       "type": 'SEND_NEWSLETTER',
       "data": {
         "title": "failed newsletter",
-        "to": "shihyentwreporter.org",
+        "to": "mail",
         "template": "<body><h3>task queue test</h3></body>"
       }
     },
@@ -25,7 +25,7 @@ export const testConfig = {
       "type": 'SEND_NEWSLETTER',
       "data": {
         "title": "",
-        "to": "shihyen@twreporter.org",
+        "to": "mail",
         "template": "<body><h3>task queue test</h3></body>"
       }
     }
@@ -34,7 +34,7 @@ export const testConfig = {
     "type": 'SEND_VERIFY_MAIL',
     "data": {
       "title": "success verify mail",
-      "to": "shihyen@twreporter.org",
+      "to": "mail",
       "template": "<body><h3>task queue test</h3></body>"
     },
     "options": {
@@ -48,7 +48,7 @@ export const testConfig = {
       "type": 'SEND_VERIFY_MAIL',
       "data": {
         "title": "failed verify mail",
-        "to": "shihyentwreporter.org",
+        "to": "mail",
         "template": "<body><h3>task queue test</h3></body>"
       },
       "options": {
@@ -60,7 +60,7 @@ export const testConfig = {
       "type": 'SEND_VERIFY_MAIL',
       "data": {
         "title": "",
-        "to": "shihyen@twreporter.org",
+        "to": "mail",
         "template": "<body><h3>task queue test</h3></body>"
       },
       "options": {
@@ -69,12 +69,12 @@ export const testConfig = {
     }
   },
 
-  createJobUrl: 'http://localhost:3030/job',
-  getQueueState: 'http://localhost:3030/stats',
+  createJobUrl: 'http://localhost:3000/job',
+  getQueueState: 'http://localhost:3000/stats',
 
   fakeConfig: {
     "kue_config": {
-      "PORT": 3030,
+      "PORT": 3000,
       "SHUTDOWN_DELAY": 1,
       "MAX_PROCESS_JOB": 5
     },
@@ -84,11 +84,11 @@ export const testConfig = {
       "REDIS_RETRY_TIME": 3000
     },
     "mail_options": {
-      "feedbackName": "報導者 The Reporter"
+      "feedbackName": "feedbackName"
     },
     "smtp_config": {
-      "SMTPUsername": "newsletter-twreporter@outlook.com",
-      "SMTPPassword": "testAccount4SendingMail",
+      "SMTPUsername": "user_name",
+      "SMTPPassword": "user_password",
       "SMTPServer": "smtp.office365.com",
       "SMTPPort": "587",
       "connectionTimeout": 300000,
@@ -100,7 +100,7 @@ export const testConfig = {
   delayCheckMailTime: 5,
 
   mailLogin: {
-    user: 'shihyen@twreporter.org',
-    password: 'vul3rm03'
+    user: 'user_name',
+    password: 'user_password'
   }
 }

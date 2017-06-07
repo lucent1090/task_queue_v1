@@ -9,6 +9,7 @@ export default function kueServer () {
   let lastEnterTime = 0
   let jobTypeList = []
   let em = new EventEmitter()
+  let shutdownDelay
 
   function create (kue_config, redis_config) {
     // redis set up
@@ -40,6 +41,8 @@ export default function kueServer () {
         }
       }
     }
+
+    shutdownDelay = kue_config.SHUTDOWN_DELAY
 
     return new Promise((resolve, reject) => {
       // create new queue
@@ -91,10 +94,6 @@ export default function kueServer () {
 
   }
 
-  function finishRemove () {
-    em.emit('kue-server-jobRemove-done')
-  }
-
   function addJobTypeList (type) {
     if( ! jobTypeList.includes(type)  ){
       jobTypeList.push(type)
@@ -114,7 +113,7 @@ export default function kueServer () {
   }
 
   function close () {
-    queue.shutdown( 1, function(err) {
+    queue.shutdown( shutdownDelay, function(err) {
       console.log( 'kue-server: shutdown: ', err||'ok' )
     })
   }
