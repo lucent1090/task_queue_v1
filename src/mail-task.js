@@ -26,7 +26,6 @@ exports.create = function () {
   let taskServer = kueServer()
   let pKue = taskServer.create(config.kue_config, config.redis_config)
   taskServer.initSetting()
-  taskServer.setJobClean(config.kue_config.CLEAN_INTERVAL)
 
   let em = new EventEmitter()
   let promise = Promise.all([pSMTP, pKue])
@@ -66,10 +65,6 @@ function addWorker (taskFile) {
 
   if( 'taskServer' in taskFile ){
     taskFile.taskServer = this.taskServer
-  }
-
-  if( taskFile.redoFailedJob ){
-    this.taskServer.setFailedJobRedo(taskFile.type, this.config.kue_config.FAILEDJOB_REDO_INTERVAL)
   }
 
   this.taskServer.getQueue().process(taskFile.type, this.config.kue_config.MAX_PROCESS_JOB, (job, done) => {

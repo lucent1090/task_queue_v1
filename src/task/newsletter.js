@@ -6,7 +6,6 @@ export let newsletter = {
   smtp_config: {
     SMTPUsername: null
   },
-  redoFailedJob: true,
   transporter: null,
   worker: function (job, done) {
     let self = this

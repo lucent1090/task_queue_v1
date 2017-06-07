@@ -124,8 +124,6 @@ export default function kueServer () {
     initSetting,     // init error callback
     getQueue,
     close,           // close queue
-    setJobClean,     // function: clean complete job
-    setFailedJobRedo,// function: redo failed job
     addJobTypeList,  // function: regist job type
     getJobTypeList,
     isRedisError,    // redis error flag

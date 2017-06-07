@@ -41,27 +41,7 @@ describe('mail-task test', function () {
       let taskID
 
       createJob(successVerifyMail)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-              console.log(id + ' complete', result)
-              resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
         sleep.sleep(delayCheckMailTime)
 
@@ -82,27 +62,7 @@ describe('mail-task test', function () {
       let taskID
 
       createJob(successNewsletter)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-            console.log(id + ' complete', result)
-            resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
         sleep.sleep(delayCheckMailTime)
 
@@ -118,7 +78,6 @@ describe('mail-task test', function () {
     })
 
   })
-
   describe('send verify mail failed', function () {
     let delayCheckMailTime = testConfig.delayCheckMailTime
 
@@ -128,28 +87,7 @@ describe('mail-task test', function () {
       let curDate = new Date()
 
       createJob(invalidAddress)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            console.log(id + 'failed', err)
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-              console.log(id + ' complete', result)
-              resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
       }, (err) => {
         sleep.sleep(delayCheckMailTime)
@@ -172,32 +110,10 @@ describe('mail-task test', function () {
     })
     it('should not receive verify mail if empty field', function () {
       let emptyField = testConfig.failedVerifyMail.emptyField
-      let taskID
       let curDate = new Date()
 
       createJob(emptyField)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            console.log(id + 'failed', err)
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-              console.log(id + ' complete', result)
-              resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
       }, (err) => {
         sleep.sleep(delayCheckMailTime)
@@ -228,28 +144,7 @@ describe('mail-task test', function () {
       let curDate = new Date()
 
       createJob(invalidAddress)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            console.log(id + 'failed', err)
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-              console.log(id + ' complete', result)
-              resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
       }, (err) => {
         sleep.sleep(delayCheckMailTime)
@@ -276,28 +171,7 @@ describe('mail-task test', function () {
       let curDate = new Date()
 
       createJob(emptyField)
-      let promise = new Promise((resolve, reject) => {
-
-        mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
-          console.log(type, ' ', id)
-          taskID = id
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
-          if( id == taskID ){
-            console.log(id + 'failed', err)
-            reject(err)
-          }
-        })
-
-        mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
-          if( id == taskID ){
-              console.log(id + ' complete', result)
-              resolve()
-          }
-
-        })
-      })
+      let promise = getJobState(mailtaskServer)
       promise = promise.then(() => {
       }, (err) => {
         sleep.sleep(delayCheckMailTime)
@@ -350,6 +224,14 @@ function getCount (name) {
     })
   })
 }
+
+/*
+ *  return  a promise
+ *  streamCallback:
+ *    buffer:  lastest mail
+ *    return:  null, means reject( new Error('no match mail') )
+ *             value, means resolve
+ */
 function getMail (box, state, command, streamCallback) {
   let mailLogin = testConfig.mailLogin
   return new Promise((resolve, reject) => {
@@ -373,7 +255,7 @@ function getMail (box, state, command, streamCallback) {
             console.log('search unseen error: ', err1||'no results')
             reject(err1)
           }
-          console.log('unseen mails:', results)
+
           let latest = [ Math.max(...results) ]
           var f = imap.fetch(latest, { bodies: command })
 
@@ -416,5 +298,33 @@ function getMail (box, state, command, streamCallback) {
     imap.once('end', function() {
     });
     imap.connect();
+  })
+}
+
+/*
+ *  return a promise
+ *  resolve: job is in complete queue
+ *  reject:  job is in failed queue
+ */
+function getJobState (mailtaskServer) {
+  let taskID
+  return new Promise ((resolve, reject) => {
+
+    mailtaskServer.taskServer.getQueue().on('job enqueue', (id, type) => {
+      taskID = id
+    })
+
+    mailtaskServer.taskServer.getQueue().on('job failed', (id, err) => {
+      if( id == taskID ){
+        reject(err)
+      }
+    })
+
+    mailtaskServer.taskServer.getQueue().on('job complete', (id, result) => {
+      if( id == taskID ){
+          resolve()
+      }
+    })
+
   })
 }
