@@ -77,7 +77,7 @@ export default function kueServer () {
         console.log(err)
         lastEnterTime = date
       }
-    });
+    })
 
     queue.on('job enqueue', (id, type) => {
       if( !jobTypeList.includes(type) ){
@@ -88,6 +88,23 @@ export default function kueServer () {
         })
       }
     })
+
+    let lastRemoveTime = 0
+    let timeoutID
+    queue.on('job remove', (id) => {
+      let curTime = new Date().getSeconds()
+      if(((curTime - lastRemoveTime)%60) < 2){
+        console.log('clear timeout')
+        clearTimeout(timeoutID)
+      }
+      timeoutID = setTimeout(finishRemove, 3000)
+      lastRemoveTime = curTime
+    })
+
+  }
+
+  function finishRemove () {
+    em.emit('kue-server-jobRemove-done')
   }
 
   function addJobTypeList (type) {
@@ -113,15 +130,15 @@ export default function kueServer () {
       kue.Job.rangeByState('complete', 0, -1, 'asc', (err, completedjobs)=>{
         if( err || (completedjobs.length==0) ){
           console.log('kue-server: get completed job error', err || ': length = 0');
-          return ;
+          return
         }
 
         em.emit('kue-server-completeJob-clean', completedjobs.length)
         console.log('kue-server: clean completed job in task queue');
         completedjobs.forEach((job)=>{
-          job.remove();
-        });
-      });
+          job.remove()
+        })
+      })
     }
     setInterval(clean, clean_interval);
   }

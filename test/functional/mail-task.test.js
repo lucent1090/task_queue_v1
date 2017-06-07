@@ -37,7 +37,8 @@ describe('mail-task test', function () {
     mailtaskServer.addWorker(newsletter)
     mailtaskServer.addWorker(verifymail)
     mailtaskServer.em.on('mail-task-ready', () => {
-      setTimeout(getFailedJob, 40000, callback)
+      let redoTime = testConfig.kue_config.FAILEDJOB_REDO_INTERVAL
+      setTimeout(getFailedJob, redoTime, callback)
       done()
     })
   })
@@ -332,19 +333,30 @@ describe('mail-task test', function () {
       return expect(promise).eventually.be.rejectedWith( 'no match mail' )
     })
   })
+
   describe('clean complete job', function () {
     before(function (done) {
       mailtaskServer.taskServer.em.on('kue-server-completeJob-clean', function (num) {
-        console.log('kue-server-completeJob-clean: ', num)
+        console.log('clean complete job: before')
         done()
       })
     })
-    it('should clean failed job', function () {
-      let promise = getCount('completeCount')
+    it('should clean complete job', function () {
+      let promise = new Promise((resolve, reject) => {
+        mailtaskServer.taskServer.em.on('kue-server-jobRemove-done', () => {
+          console.log('job remove finish')
+          resolve()
+        })
+      })
+      promise = promise.then((resolve, reject) => {
+        return getCount('completeCount')
+      })
+
       return expect(promise).eventually.equal(0)
     })
   })
 */
+
   describe('redo failed job', function () {
     let num
     before(function (done) {
@@ -360,6 +372,7 @@ describe('mail-task test', function () {
       return expect(promise).eventually.equal(failedJobNum - num)
     })
   })
+
 })
 
 function createJob (job) {
