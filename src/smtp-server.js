@@ -14,7 +14,7 @@ export default function smtp () {
         connectionTimeout: smtp_config.connectionTimeout,
         host: smtp_config.SMTPServer,
         port: smtp_config.SMTPPort,
-        secure: false, // upgrade later with STARTTLS
+        secure: false,    // upgrade later with STARTTLS
         requireTLS: true, // this should force nodemailer to use STARTTLS
         auth: {
           user: smtp_config.SMTPUsername,

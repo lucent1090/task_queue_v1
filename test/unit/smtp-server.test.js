@@ -9,23 +9,31 @@ import nodemailer from 'nodemailer'
 import smtp from '../smtp-server'
 
 describe('SMTP-server test', () => {
-  let smtpServer, createTransportSpy, config
+  let smtpServer, createTransportStub, verifyCBstub, fakeConfig
 
   before(() => {
-    createTransportSpy = sinon.spy(nodemailer, 'createTransport')
+    fakeConfig = {
+      SMTPUsername: 'testUser'
+    }
 
-    config = JSON.parse( fs.readFileSync('src/config.json') )
+    verifyCBstub = sinon.stub()
+    createTransportStub = sinon.stub(nodemailer, 'createTransport')
+    createTransportStub.returns({
+      SMTPUsername: 'testUser',
+      verify: verifyCBstub
+    })
     smtpServer = smtp()
+
   })
 
   after(() => {
-    createTransportSpy.restore()
+    createTransportStub.restore()
   })
 
   it('create function should call nodemailer.createTransport', () => {
-    smtpServer.create(config)
+    smtpServer.create(fakeConfig)
 
-    expect(createTransportSpy.called).to.be.true
-    expect(smtpServer.getTransporter()).to.not.equal(null)
+    expect(createTransportStub.called).to.be.true
+    expect(verifyCBstub.called).to.be.true
   })
 })

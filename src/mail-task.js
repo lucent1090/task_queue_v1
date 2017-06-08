@@ -4,6 +4,7 @@ import fs from 'fs'
 import smtp from './smtp-server'
 import kueServer from './kue-server'
 import { EventEmitter } from 'events'
+import path from 'path'
 
 exports.create = function () {
   let config
@@ -12,7 +13,7 @@ exports.create = function () {
   }else{
     // load config
     try{
-      config = JSON.parse( fs.readFileSync('src/config.json') )
+      config = JSON.parse( fs.readFileSync(path.join('__dirname', '..', 'src', 'config.json')))
     } catch (err) {
       console.log(err)
     }
@@ -51,7 +52,7 @@ function server (mailServer, taskServer, config, em) {
     config,     // config.json
     addWorker,  // function: add new worker to queue server
     close,      // function: close queue and smtp connection
-    em          // function: events
+    em          // events
   }
 }
 
